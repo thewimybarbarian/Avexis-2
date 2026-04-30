@@ -5,6 +5,9 @@
   --cyan-light: #5DE5FF;
   --cyan-deep: #00A3CC;
   --cyan-soft: rgba(0, 212, 255, 0.12);
+  --amber: #FFB020;
+  --amber-light: #FFC852;
+  --amber-soft: rgba(255, 176, 32, 0.12);
   --dark: #000000;
   --dark-card: #0A0A0F;
   --dark-rise: #0E0E17;
@@ -236,7 +239,7 @@ input, textarea { font: inherit; color: inherit; }
 
 .av-section-head { max-width: 880px; margin-bottom: 64px; }
 .av-section-head__meta { display: inline-flex; align-items: center; gap: 14px; }
-.av-section-head__num { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--cyan); }
+.av-section-head__num { font-family: var(--mono); font-size: 11px; letter-spacing: .18em; color: var(--amber); }
 .av-section-head__line { width: 48px; height: 1px; background: linear-gradient(90deg, var(--cyan), transparent); }
 .av-section-head__sub { color: var(--gray-light); max-width: 62ch; margin: 22px 0 0; font-size: 17px; line-height: 1.55; }
 
@@ -255,7 +258,7 @@ input, textarea { font: inherit; color: inherit; }
 .av-service-card__top { display: flex; justify-content: space-between; align-items: center; }
 .av-service-card__icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.2); display: grid; place-items: center; color: var(--cyan); }
 .av-service-card__price { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--cyan); text-transform: uppercase; background: rgba(0,212,255,.1); padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(0,212,255,.2); }
-.av-service-card__num { font-family: var(--mono); font-size: 11px; color: var(--gray-dim); letter-spacing: .14em; }
+.av-service-card__num { font-family: var(--mono); font-size: 11px; color: var(--amber); letter-spacing: .14em; }
 .av-service-card__title { font-family: var(--display); font-weight: 700; font-size: 22px; color: #fff; margin: 6px 0 4px; letter-spacing: .01em; }
 .av-service-card__desc { color: var(--gray-light); font-size: 14px; line-height: 1.55; margin: 0; }
 .av-service-card__bullets { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; font-size: 13px; color: var(--gray-light); }
