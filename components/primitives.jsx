@@ -311,6 +311,141 @@ const Icon = {
   Send: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>,
 };
 
+/* ---------- NeuralNet — sparse node network with periodic signal pulses ---------- */
+function NeuralNet() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const canvas = ref.current; if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const isMobile = window.innerWidth < 768;
+    const NODE_COUNT = isMobile ? 45 : 95;
+    const MAX_NEIGHBORS = 3;
+    const CONN_DIST = isMobile ? 130 : 170;
+    const SPAWN_INTERVAL = 0.32;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    let nodes = [], edges = [], pulses = [];
+    let raf = 0, lastT = 0, accum = 0;
+
+    const build = () => {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      nodes = Array.from({ length: NODE_COUNT }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.06,
+        vy: (Math.random() - 0.5) * 0.06,
+      }));
+      edges = [];
+      const seen = new Set();
+      for (let i = 0; i < nodes.length; i++) {
+        const cands = [];
+        for (let j = 0; j < nodes.length; j++) {
+          if (i === j) continue;
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const d = Math.hypot(dx, dy);
+          if (d <= CONN_DIST) cands.push({ j, d });
+        }
+        cands.sort((a, b) => a.d - b.d);
+        for (let k = 0; k < Math.min(MAX_NEIGHBORS, cands.length); k++) {
+          const j = cands[k].j;
+          const key = i < j ? i + '-' + j : j + '-' + i;
+          if (!seen.has(key)) { seen.add(key); edges.push({ a: i, b: j }); }
+        }
+      }
+    };
+
+    const spawn = () => {
+      if (!edges.length) return;
+      const e = edges[Math.floor(Math.random() * edges.length)];
+      const r = Math.random();
+      const color = r < 0.15 ? '#F5D300' : r < 0.35 ? '#FFB020' : '#00D4FF';
+      pulses.push({ edge: e, t: 0, speed: 0.45 + Math.random() * 0.55, color });
+    };
+
+    const render = (now) => {
+      raf = requestAnimationFrame(render);
+      const dt = lastT ? Math.min((now - lastT) / 1000, 0.05) : 0;
+      lastT = now;
+      const cw = canvas.clientWidth, ch = canvas.clientHeight;
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(dpr, dpr);
+
+      for (const n of nodes) {
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > cw) n.vx *= -1;
+        if (n.y < 0 || n.y > ch) n.vy *= -1;
+      }
+
+      ctx.strokeStyle = 'rgba(0, 212, 255, 0.06)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (const e of edges) {
+        const a = nodes[e.a], b = nodes[e.b];
+        ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y);
+      }
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
+      for (const n of nodes) {
+        ctx.beginPath(); ctx.arc(n.x, n.y, 1.2, 0, Math.PI * 2); ctx.fill();
+      }
+
+      ctx.globalCompositeOperation = 'lighter';
+      pulses = pulses.filter(p => {
+        p.t += p.speed * dt;
+        if (p.t >= 1) return false;
+        const a = nodes[p.edge.a], b = nodes[p.edge.b];
+        const x = a.x + (b.x - a.x) * p.t;
+        const y = a.y + (b.y - a.y) * p.t;
+        const grad = ctx.createRadialGradient(x, y, 0, x, y, 14);
+        grad.addColorStop(0, p.color);
+        grad.addColorStop(0.4, p.color + 'A0');
+        grad.addColorStop(1, p.color + '00');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = p.color;
+        ctx.beginPath(); ctx.arc(x, y, 1.6, 0, Math.PI * 2); ctx.fill();
+        return true;
+      });
+      ctx.globalCompositeOperation = 'source-over';
+
+      accum += dt;
+      while (accum >= SPAWN_INTERVAL) { spawn(); accum -= SPAWN_INTERVAL; }
+    };
+
+    let resizeT = 0;
+    const onResize = () => {
+      clearTimeout(resizeT);
+      resizeT = setTimeout(build, 200);
+    };
+    const onVis = () => {
+      if (document.hidden) { cancelAnimationFrame(raf); raf = 0; }
+      else if (!raf) { lastT = 0; raf = requestAnimationFrame(render); }
+    };
+
+    build();
+    raf = requestAnimationFrame(render);
+    window.addEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(resizeT);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVis);
+    };
+  }, []);
+
+  return <canvas ref={ref} className="av-neural-net" />;
+}
+
 Object.assign(window, {
-  MagneticCursor, AuroraShader, DecryptText, ShinyText, CountUp, TiltCard, Reveal, Icon
+  MagneticCursor, AuroraShader, DecryptText, ShinyText, CountUp, TiltCard, Reveal, Icon, NeuralNet
 });

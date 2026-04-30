@@ -114,6 +114,7 @@ function App() {
 
   return (
     <>
+      <NeuralNet />
       <MagneticCursor />
       <ScrollProgress />
       {!introDone && <Intro onComplete={() => setIntroDone(true)} />}
