@@ -20,29 +20,35 @@
   font-weight: 900 !important;
   font-size: clamp(60px, 14vw, 200px) !important;
   letter-spacing: .04em !important;
-  color: #3a3a5c !important;
+  color: #4a4a72 !important;
   background-image: linear-gradient(
     110deg,
-    #3a3a5c 0%,
-    #3a3a5c 35%,
+    #4a4a72 0%,
+    #4a4a72 32%,
+    var(--cyan, #00D4FF) 42%,
     #ffffff 48%,
-    var(--cyan, #00D4FF) 50%,
-    #ffffff 52%,
-    #3a3a5c 65%,
-    #3a3a5c 100%
+    var(--yellow, #F5D300) 50%,
+    var(--amber, #FFB020) 52%,
+    var(--cyan, #00D4FF) 58%,
+    #4a4a72 70%,
+    #4a4a72 100%
   ) !important;
-  background-size: 200% 100% !important;
+  background-size: 220% 100% !important;
   background-position: 100% 0 !important;
   background-repeat: no-repeat !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
-  animation: avFooterGleam 3s linear infinite !important;
+  animation: avFooterGleam 4.5s cubic-bezier(.4,0,.2,1) infinite, avFooterPulse 3s ease-in-out infinite !important;
   filter: drop-shadow(0 0 40px rgba(0, 212, 255, 0.4));
 }
 @keyframes avFooterGleam {
-  0%   { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+  0%   { background-position: 110% 0; }
+  100% { background-position: -110% 0; }
+}
+@keyframes avFooterPulse {
+  0%, 100% { filter: drop-shadow(0 0 30px rgba(0, 212, 255, 0.3)) drop-shadow(0 0 60px rgba(255, 176, 32, 0.08)); }
+  50%      { filter: drop-shadow(0 0 50px rgba(0, 212, 255, 0.5)) drop-shadow(0 0 90px rgba(255, 176, 32, 0.15)); }
 }
 .av-footer__mark-gleam { display: none; }
 

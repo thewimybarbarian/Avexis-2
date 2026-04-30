@@ -8,6 +8,8 @@
   --amber: #FFB020;
   --amber-light: #FFC852;
   --amber-soft: rgba(255, 176, 32, 0.12);
+  --yellow: #F5D300;
+  --yellow-soft: rgba(245, 211, 0, 0.12);
   --dark: #000000;
   --dark-card: #0A0A0F;
   --dark-rise: #0E0E17;
@@ -23,9 +25,9 @@
 }
 
 * { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; background: var(--dark); color: #fff; font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+html, body { margin: 0; padding: 0; background: var(--dark); color: #fff; font-family: var(--sans); -webkit-font-smoothing: antialiased; overflow-x: clip; max-width: 100vw; }
 body { cursor: none; }
-@media (hover: none) { body { cursor: auto; } }
+@media (hover: none) { body { cursor: auto; } .av-cursor-dot, .av-cursor-ring { display: none; } }
 ::selection { background: var(--cyan); color: var(--dark); }
 img, svg { display: block; }
 a { color: inherit; text-decoration: none; }
@@ -257,7 +259,7 @@ input, textarea { font: inherit; color: inherit; }
 .av-service-card:hover::before { opacity: 1; }
 .av-service-card__top { display: flex; justify-content: space-between; align-items: center; }
 .av-service-card__icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.2); display: grid; place-items: center; color: var(--cyan); }
-.av-service-card__price { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--cyan); text-transform: uppercase; background: rgba(0,212,255,.1); padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(0,212,255,.2); }
+.av-service-card__price { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; color: var(--yellow); text-transform: uppercase; background: var(--yellow-soft); padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(245, 211, 0, 0.3); }
 .av-service-card__num { font-family: var(--mono); font-size: 11px; color: var(--amber); letter-spacing: .14em; }
 .av-service-card__title { font-family: var(--display); font-weight: 700; font-size: 22px; color: #fff; margin: 6px 0 4px; letter-spacing: .01em; }
 .av-service-card__desc { color: var(--gray-light); font-size: 14px; line-height: 1.55; margin: 0; }
@@ -487,7 +489,8 @@ input, textarea { font: inherit; color: inherit; }
 .av-count__suffix { color: var(--cyan); margin-left: 2px; }
 
 /* ---------- SplitText ---------- */
-.av-split { display: inline-block; }
+.av-split { display: inline; }
+.av-split__word { display: inline-block; white-space: nowrap; }
 .av-split__ch { display: inline-block; overflow: hidden; vertical-align: baseline; transition: opacity .7s var(--ease), transform .9s var(--ease); }
 .av-split__inner { display: inline-block; }
 .av-split--rise .av-split__ch { transition: transform .9s var(--ease), opacity .6s var(--ease); }
@@ -655,10 +658,31 @@ input, textarea { font: inherit; color: inherit; }
   .av-work__kind { grid-column: 1 / -1; text-align: left; }
   .av-agents__shell { grid-template-columns: 1fr; min-height: auto; }
   .av-agents__side { border-right: none; border-bottom: 1px solid var(--dark-border); }
-  .av-estimator__frame { grid-template-columns: 1fr; }
-  .av-estimator__controls { border-right: none; border-bottom: 1px solid var(--dark-border); }
+  .av-estimator__frame { grid-template-columns: 1fr; min-height: auto; }
+  .av-estimator__controls { border-right: none; border-bottom: 1px solid var(--dark-border); padding: 22px; gap: 18px; }
+  .av-estimator__readout { padding: 22px; gap: 14px; }
+  .av-estimator__value { font-size: clamp(40px, 13vw, 64px); }
+  .av-estimator__currency { font-size: 18px; }
+  .av-estimator__sub { grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .av-agents__shell { min-height: auto; }
+  .av-agents__side { padding: 16px; gap: 10px; }
+  .av-agents__scroll { padding: 18px 18px; max-height: 380px; }
+  .av-agents__prompts { padding: 10px 18px; gap: 6px; }
+  .av-agents__prompt { font-size: 11px; padding: 6px 10px; }
+  .av-agents__input { padding: 12px 14px; gap: 10px; }
+  .av-agents__input input { font-size: 14px; }
+  .av-agents__input button { padding: 8px 12px; font-size: 11px; }
   .av-pricing__grid { grid-template-columns: 1fr; }
   .av-contact__grid { grid-template-columns: 1fr; gap: 40px; }
+  .av-contact__form { padding: 22px; }
+  .av-contact__channels { grid-template-columns: 1fr; gap: 10px; }
+  .av-contact__field input, .av-contact__field textarea { width: 100%; min-width: 0; }
   .av-footer__grid { grid-template-columns: 1fr 1fr; }
   .av-footer__foot { flex-direction: column; gap: 10px; text-align: center; }
+  .av-h2 { font-size: clamp(28px, 8vw, 44px); }
+  .av-hero { padding: 100px 16px 40px; }
+  .av-hero__title { font-size: clamp(40px, 12vw, 64px); max-width: 100%; }
+  .av-hero__sub { font-size: 15px; }
+  .av-intro__skip { right: 16px; bottom: 16px; padding: 8px 14px; font-size: 10px; }
+  .av-marquee__row { font-size: clamp(18px, 5vw, 24px); }
 }

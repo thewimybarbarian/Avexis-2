@@ -15,14 +15,25 @@ function SplitText({ text, className = '', delay = 0, stagger = 28, as = 'span',
     }, { threshold: 0.2 });
     io.observe(el); return () => io.disconnect();
   }, [once]);
-  const chars = Array.from(text);
+  const words = text.split(' ');
+  let charIdx = 0;
   return (
     <Tag ref={ref} className={`av-split av-split--${mode} ${className}`} aria-label={text}>
-      {chars.map((c, i) => (
-        <span key={i} className="av-split__ch" aria-hidden="true"
-          style={{ transitionDelay: `${delay + i * stagger}ms`, opacity: seen ? 1 : 0, transform: seen ? 'none' : (mode === 'rise' ? 'translateY(100%)' : 'translateY(20px)') }}>
-          <span className="av-split__inner">{c === ' ' ? '\u00A0' : c}</span>
-        </span>
+      {words.map((word, wi) => (
+        <React.Fragment key={wi}>
+          {wi > 0 && ' '}
+          <span className="av-split__word">
+            {Array.from(word).map((c, ci) => {
+              const i = charIdx++;
+              return (
+                <span key={ci} className="av-split__ch" aria-hidden="true"
+                  style={{ transitionDelay: `${delay + i * stagger}ms`, opacity: seen ? 1 : 0, transform: seen ? 'none' : (mode === 'rise' ? 'translateY(100%)' : 'translateY(20px)') }}>
+                  <span className="av-split__inner">{c}</span>
+                </span>
+              );
+            })}
+          </span>
+        </React.Fragment>
       ))}
     </Tag>
   );
