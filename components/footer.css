@@ -11,9 +11,30 @@
   margin: 0 auto 40px;
   text-align: center;
   line-height: .85;
-  overflow: hidden;
+  overflow: visible;
   max-width: 100%;
 }
+.av-footer__mark::before {
+  content: 'AVEXIS';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--display);
+  font-weight: 900;
+  font-size: clamp(60px, 14vw, 200px);
+  letter-spacing: .04em;
+  color: rgba(0, 212, 255, 0.04);
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(2px);
+  animation: avFooterEchoDrift 6s ease-in-out infinite;
+}
+@keyframes avFooterEchoDrift {
+  0%, 100% { transform: translate(-50%, -50%) scale(1.04); opacity: 0.6; }
+  50%      { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+.av-footer__mark-text { position: relative; z-index: 1; }
 .av-footer__mark-text {
   display: inline-block !important;
   font-family: var(--display) !important;

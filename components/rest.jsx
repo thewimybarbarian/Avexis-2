@@ -243,10 +243,10 @@ function Contact() {
 function Footer() {
   return (
     <footer className="av-footer">
-      <div className="av-footer__mark">
+      <Reveal className="av-footer__mark">
         <span className="av-footer__mark-text" data-text="AVEXIS">AVEXIS</span>
         <span className="av-footer__mark-gleam" />
-      </div>
+      </Reveal>
       <div className="av-footer__grid">
         <div>
           <span className="av-mono-label" style={{ color: 'var(--cyan)' }}>// AVEXIS</span>
