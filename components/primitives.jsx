@@ -324,10 +324,13 @@ function NeuralNet() {
     const NODE_COUNT = isMobile ? 45 : 95;
     const MAX_NEIGHBORS = 3;
     const CONN_DIST = isMobile ? 130 : 170;
-    const SPAWN_INTERVAL = 0.32;
+    const SPAWN_INTERVAL = 0.22;
+    const TRAIL_LEN = 0.4;
+    const BRANCH_PROB = 0.45;
+    const MAX_DEPTH = 3;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    let nodes = [], edges = [], pulses = [];
+    let nodes = [], edges = [], pulses = [], adj = [];
     let raf = 0, lastT = 0, accum = 0;
 
     const build = () => {
@@ -357,14 +360,31 @@ function NeuralNet() {
           if (!seen.has(key)) { seen.add(key); edges.push({ a: i, b: j }); }
         }
       }
+      // Build adjacency: for each node, list edge indices that touch it
+      adj = nodes.map(() => []);
+      for (let ei = 0; ei < edges.length; ei++) {
+        adj[edges[ei].a].push(ei);
+        adj[edges[ei].b].push(ei);
+      }
     };
 
-    const spawn = () => {
+    const spawn = (edgeIdx, fromNode, color, depth) => {
       if (!edges.length) return;
-      const e = edges[Math.floor(Math.random() * edges.length)];
-      const r = Math.random();
-      const color = r < 0.15 ? '#F5D300' : r < 0.35 ? '#FFB020' : '#00D4FF';
-      pulses.push({ edge: e, t: 0, speed: 0.45 + Math.random() * 0.55, color });
+      if (edgeIdx == null) edgeIdx = Math.floor(Math.random() * edges.length);
+      const e = edges[edgeIdx];
+      if (color == null) {
+        const r = Math.random();
+        color = r < 0.10 ? '#F5D300' : r < 0.22 ? '#FFB020' : '#00D4FF';
+      }
+      // Direction: fromNode is where the pulse starts; if not set, randomize
+      const reversed = fromNode != null ? (e.b === fromNode) : (Math.random() < 0.5);
+      pulses.push({
+        edgeIdx, reversed,
+        t: 0,
+        speed: 0.7 + Math.random() * 0.7,
+        color,
+        depth: depth || 0,
+      });
     };
 
     const render = (now) => {
@@ -398,22 +418,58 @@ function NeuralNet() {
       }
 
       ctx.globalCompositeOperation = 'lighter';
-      pulses = pulses.filter(p => {
+      ctx.lineCap = 'round';
+      const next = [];
+      for (const p of pulses) {
         p.t += p.speed * dt;
-        if (p.t >= 1) return false;
-        const a = nodes[p.edge.a], b = nodes[p.edge.b];
-        const x = a.x + (b.x - a.x) * p.t;
-        const y = a.y + (b.y - a.y) * p.t;
-        const grad = ctx.createRadialGradient(x, y, 0, x, y, 14);
-        grad.addColorStop(0, p.color);
-        grad.addColorStop(0.4, p.color + 'A0');
-        grad.addColorStop(1, p.color + '00');
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = p.color;
-        ctx.beginPath(); ctx.arc(x, y, 1.6, 0, Math.PI * 2); ctx.fill();
-        return true;
-      });
+        const e = edges[p.edgeIdx];
+        const start = nodes[p.reversed ? e.b : e.a];
+        const end   = nodes[p.reversed ? e.a : e.b];
+        if (p.t >= 1) {
+          // Pulse reached the end node — branch with probability
+          const endIdx = p.reversed ? e.a : e.b;
+          if (p.depth < MAX_DEPTH && Math.random() < BRANCH_PROB) {
+            const candidates = adj[endIdx].filter(ei => ei !== p.edgeIdx);
+            if (candidates.length) {
+              const childCount = Math.random() < 0.25 ? 2 : 1;
+              for (let c = 0; c < Math.min(childCount, candidates.length); c++) {
+                const ci = candidates[Math.floor(Math.random() * candidates.length)];
+                spawn(ci, endIdx, p.color, p.depth + 1);
+              }
+            }
+          }
+          continue;
+        }
+        const x = start.x + (end.x - start.x) * p.t;
+        const y = start.y + (end.y - start.y) * p.t;
+        // Trail: fading line from t-TRAIL_LEN to t
+        const tStart = Math.max(0, p.t - TRAIL_LEN);
+        const tx = start.x + (end.x - start.x) * tStart;
+        const ty = start.y + (end.y - start.y) * tStart;
+        const trail = ctx.createLinearGradient(tx, ty, x, y);
+        trail.addColorStop(0,   p.color + '00');
+        trail.addColorStop(0.6, p.color + '55');
+        trail.addColorStop(1,   p.color);
+        ctx.strokeStyle = trail;
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        // Radial glow head — white center, color around it
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, 16);
+        glow.addColorStop(0,    '#ffffff');
+        glow.addColorStop(0.18, p.color);
+        glow.addColorStop(0.55, p.color + '60');
+        glow.addColorStop(1,    p.color + '00');
+        ctx.fillStyle = glow;
+        ctx.beginPath(); ctx.arc(x, y, 16, 0, Math.PI * 2); ctx.fill();
+        // White-hot core
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill();
+        next.push(p);
+      }
+      pulses = next;
       ctx.globalCompositeOperation = 'source-over';
 
       accum += dt;
