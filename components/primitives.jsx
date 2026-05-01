@@ -384,6 +384,7 @@ function NeuralNet() {
         speed: 0.7 + Math.random() * 0.7,
         color,
         depth: depth || 0,
+        phase: Math.random() * Math.PI * 2,
       });
     };
 
@@ -456,17 +457,23 @@ function NeuralNet() {
         ctx.moveTo(tx, ty);
         ctx.lineTo(x, y);
         ctx.stroke();
-        // Radial glow head — white center, color around it
-        const glow = ctx.createRadialGradient(x, y, 0, x, y, 16);
+        // Per-pulse breathing — each has its own phase so they oscillate
+        // out of sync, which reads as organic flowing energy
+        const breath = 0.7 + 0.3 * Math.sin(now * 0.006 + p.phase);
+        const haloR  = 28 * (0.85 + 0.15 * Math.sin(now * 0.005 + p.phase));
+        const coreR  = 0.7 * breath;
+        // Wider, softer radial glow — gentler stops for diffuse falloff
+        const glow = ctx.createRadialGradient(x, y, 0, x, y, haloR);
         glow.addColorStop(0,    '#ffffff');
-        glow.addColorStop(0.18, p.color);
-        glow.addColorStop(0.55, p.color + '60');
+        glow.addColorStop(0.08, p.color);
+        glow.addColorStop(0.35, p.color + '70');
+        glow.addColorStop(0.65, p.color + '30');
         glow.addColorStop(1,    p.color + '00');
         ctx.fillStyle = glow;
-        ctx.beginPath(); ctx.arc(x, y, 16, 0, Math.PI * 2); ctx.fill();
-        // White-hot core
+        ctx.beginPath(); ctx.arc(x, y, haloR, 0, Math.PI * 2); ctx.fill();
+        // Smaller, breathing white-hot core
         ctx.fillStyle = '#ffffff';
-        ctx.beginPath(); ctx.arc(x, y, 1.4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y, coreR, 0, Math.PI * 2); ctx.fill();
         next.push(p);
       }
       pulses = next;
