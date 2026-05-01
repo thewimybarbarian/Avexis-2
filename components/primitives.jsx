@@ -381,7 +381,7 @@ function NeuralNet() {
       pulses.push({
         edgeIdx, reversed,
         t: 0,
-        speed: 0.7 + Math.random() * 0.7,
+        speed: 0.3 + Math.random() * 0.3,
         color,
         depth: depth || 0,
         phase: Math.random() * Math.PI * 2,
