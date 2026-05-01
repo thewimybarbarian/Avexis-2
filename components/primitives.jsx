@@ -324,10 +324,10 @@ function NeuralNet() {
     const NODE_COUNT = isMobile ? 45 : 95;
     const MAX_NEIGHBORS = 3;
     const CONN_DIST = isMobile ? 130 : 170;
-    const SPAWN_INTERVAL = 0.22;
+    const SPAWN_INTERVAL = 0.65;
     const TRAIL_LEN = 0.4;
-    const BRANCH_PROB = 0.45;
-    const MAX_DEPTH = 3;
+    const BRANCH_PROB = 0.2;
+    const MAX_DEPTH = 2;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     let nodes = [], edges = [], pulses = [], adj = [];
@@ -464,15 +464,15 @@ function NeuralNet() {
         const coreR  = 0.7 * breath;
         // Wider, softer radial glow — gentler stops for diffuse falloff
         const glow = ctx.createRadialGradient(x, y, 0, x, y, haloR);
-        glow.addColorStop(0,    '#ffffff');
-        glow.addColorStop(0.08, p.color);
-        glow.addColorStop(0.35, p.color + '70');
-        glow.addColorStop(0.65, p.color + '30');
+        glow.addColorStop(0,    p.color + 'CC');
+        glow.addColorStop(0.15, p.color + '80');
+        glow.addColorStop(0.45, p.color + '30');
+        glow.addColorStop(0.75, p.color + '14');
         glow.addColorStop(1,    p.color + '00');
         ctx.fillStyle = glow;
         ctx.beginPath(); ctx.arc(x, y, haloR, 0, Math.PI * 2); ctx.fill();
-        // Smaller, breathing white-hot core
-        ctx.fillStyle = '#ffffff';
+        // Subtle breathing core (no longer hard white)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.beginPath(); ctx.arc(x, y, coreR, 0, Math.PI * 2); ctx.fill();
         next.push(p);
       }
